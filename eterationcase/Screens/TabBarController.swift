@@ -16,7 +16,7 @@ class TabBarController: UITabBarController {
         let homeVC = UINavigationController(rootViewController: HomeViewController())
         homeVC.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
 
-        let cartVC = UINavigationController(rootViewController: CartViewController())
+        let cartVC = UINavigationController(rootViewController: BasketViewController())
         cartVC.tabBarItem = UITabBarItem(title: "Cart", image: UIImage(systemName: "cart"), tag: 1)
 
         let favoritesVC = UINavigationController(rootViewController: FavoritesViewController())

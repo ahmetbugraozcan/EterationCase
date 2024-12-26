@@ -9,8 +9,13 @@
 
 import UIKit
 
+// MARK: - Data Source
+
+import UIKit
+
 protocol HomeDataSourceDelegate: AnyObject {
     func didSelectProduct(_ product: ProductModel)
+    func didTapAddToBasket(_ product: ProductModel)
 }
 
 class HomeDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -44,8 +49,13 @@ class HomeDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDele
         } else {
             product = viewModel.products[indexPath.item]
         }
-
         cell.configure(product: product)
+        cell.delegate = self
+
+        cell.onAddToBasket = { [weak self] in
+            self?.delegate?.didTapAddToBasket(product)
+        }
+
         return cell
     }
 
@@ -88,5 +98,13 @@ class HomeDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDele
         if offsetY > contentHeight - height * 2 {
             onScrollReachedEnd?()
         }
+    }
+}
+
+// MARK: - ProductCellDelegate
+
+extension HomeDataSource: ProductCellDelegate {
+    func didTapAddToBasket(for product: ProductModel) {
+        delegate?.didTapAddToBasket(product) // Bu işlemi HomeViewController'a iletir
     }
 }

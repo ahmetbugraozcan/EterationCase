@@ -90,7 +90,7 @@ class HomeViewController: UIViewController {
         dataSource.delegate = self
         setupLayout()
         setupBindings()
-        
+
         dataSource.onScrollReachedEnd = { [weak self] in
             guard let self = self else { return }
             if self.viewModel.isSearchActive {
@@ -244,4 +244,20 @@ extension HomeViewController: HomeDataSourceDelegate {
         detailVC.product = product
         navigationController?.pushViewController(detailVC, animated: true)
     }
+
+    func didTapAddToBasket(_ product: ProductModel) {        
+        if BasketManager.shared.isProductInBasket(productId: product.id) {
+            showAlert(title: "Already Added", message: "This product is already in your basket.")
+        } else {
+            BasketManager.shared.addToBasket(productId: product.id, basketCount: 1)
+            showAlert(title: "Success", message: "Product added to your basket.")
+        }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 }
+
