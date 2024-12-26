@@ -8,6 +8,8 @@
 // MARK: Endpoints enum
 enum Endpoints {
     case getProducts
+    case getFilteredProducts
+    case searchProducts
 }
 
 extension Endpoints {
@@ -15,6 +17,10 @@ extension Endpoints {
         switch self {
         case .getProducts:
             return "/products"
+        case .searchProducts:
+            return "/products"
+        case .getFilteredProducts:
+            return "/filteredProducts"
         }
     }
 }
