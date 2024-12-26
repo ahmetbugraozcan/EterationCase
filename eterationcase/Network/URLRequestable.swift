@@ -25,7 +25,16 @@ extension URLRequestable {
     var parameters: [String: Any]? { nil }
 
     func createURLRequest() throws -> URLRequest {
-        guard let url = URL(string: baseURL + path) else {
+        guard var urlComponents = URLComponents(string: baseURL + path) else {
+            throw NetworkError.invalidURL
+        }
+
+        // Query Parameters
+        if let parameters = parameters {
+            urlComponents.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
+        }
+
+        guard let url = urlComponents.url else {
             throw NetworkError.invalidURL
         }
 
@@ -38,10 +47,7 @@ extension URLRequestable {
             }
         }
 
-        if let parameters = parameters {
-            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
-        }
-
         return request
     }
+
 }
