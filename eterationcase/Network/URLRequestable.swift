@@ -31,7 +31,14 @@ extension URLRequestable {
 
         // Query Parameters
         if let parameters = parameters {
-            urlComponents.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
+            urlComponents.queryItems = parameters
+                .filter { key, value in
+                    if let stringValue = value as? String {
+                        return !stringValue.isEmpty
+                    }
+                    return false // Eğer değer `String` değilse, dahil etme
+                }
+                .map { URLQueryItem(name: $0.key, value: "\($0.value)") }
         }
 
         guard let url = urlComponents.url else {
@@ -49,5 +56,6 @@ extension URLRequestable {
 
         return request
     }
+
 
 }

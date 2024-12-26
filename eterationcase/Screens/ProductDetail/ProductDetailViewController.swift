@@ -46,7 +46,7 @@ class ProductDetailViewController: UIViewController {
     
     private let addToCartButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Add to Cart", for: .normal)
+        button.setTitle("Add to Basket", for: .normal)
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 8
@@ -60,6 +60,7 @@ class ProductDetailViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
         configureProductDetails()
+        setupActions()
     }
     
     // MARK: - Setup Methods
@@ -117,5 +118,27 @@ class ProductDetailViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    private func setupActions() {
+        addToCartButton.addTarget(self, action: #selector(addToBasket), for: .touchUpInside)
+    }
+    
+    // MARK: - Actions
+    @objc private func addToBasket() {
+        guard let product = product else { return }
+        
+        if BasketManager.shared.isProductInBasket(productId: product.id) {
+            showAlert(title: "Already Added", message: "This product is already in your basket.")
+        } else {
+            BasketManager.shared.addToBasket(productId: product.id, basketCount: 1)
+            showAlert(title: "Success", message: "Product added to your basket.")
+        }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

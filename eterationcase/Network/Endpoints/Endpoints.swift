@@ -10,6 +10,7 @@ enum Endpoints {
     case getProducts
     case getFilteredProducts
     case searchProducts
+    case getProductById(_ id: String)
 }
 
 extension Endpoints {
@@ -21,6 +22,8 @@ extension Endpoints {
             return "/products"
         case .getFilteredProducts:
             return "/filteredProducts"
+        case .getProductById(let id):
+            return "/products/\(id)"
         }
     }
 }
