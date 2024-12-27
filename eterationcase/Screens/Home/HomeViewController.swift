@@ -138,16 +138,6 @@ class HomeViewController: UIViewController {
 
         viewModel.fetchProducts()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        let transition = CATransition()
-        transition.type = .fade
-        transition.duration = 0.3
-        navigationController?.navigationBar.layer.add(transition, forKey: nil)
-        
-        navigationController?.navigationBar.prefersLargeTitles = true
-    }
 
     // MARK: - Setup Methods
 

@@ -129,8 +129,6 @@ class ProductDetailViewController: UIViewController {
         transition.type = .fade
         transition.duration = 0.3
         navigationController?.navigationBar.layer.add(transition, forKey: nil)
-        
-        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     // MARK: - Setup Methods

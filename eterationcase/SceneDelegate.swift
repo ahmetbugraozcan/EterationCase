@@ -33,7 +33,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
          UINavigationBar.appearance().scrollEdgeAppearance = appearance
          UINavigationBar.appearance().compactAppearance = appearance
          UINavigationBar.appearance().tintColor = UIColor.white
-         UINavigationBar.appearance().prefersLargeTitles = true
 
          window = UIWindow(windowScene: windowScene)
          let homeVC = TabBarController()

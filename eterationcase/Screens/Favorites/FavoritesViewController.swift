@@ -140,8 +140,6 @@ class FavoritesViewController: UIViewController {
 
     private func setupNavigationBar() {
         title = "Favorites"
-        navigationController?.navigationBar.prefersLargeTitles = true
-
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Edit",
             style: .plain,
