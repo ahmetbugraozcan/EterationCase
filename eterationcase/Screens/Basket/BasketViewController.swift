@@ -9,11 +9,11 @@ import UIKit
 
 class BasketViewController: UIViewController {
     private let viewModel = BasketViewModel()
-    
+
     private lazy var loadingContainer: UIView = {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
-        container.backgroundColor = UIColor.black.withAlphaComponent(0.5) // Yarı saydam arka plan
+        container.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         container.layer.cornerRadius = 10
         container.clipsToBounds = true
         container.isHidden = true
@@ -29,6 +29,50 @@ class BasketViewController: UIViewController {
         return indicator
     }()
 
+    private lazy var emptyStateView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 16
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        let imageView = UIImageView(image: UIImage(systemName: "cart"))
+        imageView.tintColor = ThemeManager.primaryColor
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = "Your basket is empty"
+        label.font = FontManager.Body1.medium
+        label.textColor = ThemeManager.primaryTextColor
+        label.textAlignment = .center
+
+        let descriptionLabel = UILabel()
+        descriptionLabel.text = "Items you add to your basket will appear here"
+        descriptionLabel.font = FontManager.Body2.regular
+        descriptionLabel.textColor = ThemeManager.secondaryTextColor
+        descriptionLabel.textAlignment = .center
+
+        stackView.addArrangedSubview(imageView)
+        stackView.addArrangedSubview(label)
+        stackView.addArrangedSubview(descriptionLabel)
+        view.addSubview(stackView)
+
+        NSLayoutConstraint.activate([
+            imageView.heightAnchor.constraint(equalToConstant: 60),
+            imageView.widthAnchor.constraint(equalToConstant: 60),
+
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+
+        return view
+    }()
+
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +82,7 @@ class BasketViewController: UIViewController {
         tableView.separatorStyle = .none
         return tableView
     }()
-    
+
     private lazy var totalLabel: UILabel = {
         let label = UILabel()
         label.font = FontManager.Body1.regular
@@ -46,7 +90,7 @@ class BasketViewController: UIViewController {
         label.numberOfLines = 0
         return label
     }()
-    
+
     private lazy var completeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Complete", for: .normal)
@@ -58,17 +102,19 @@ class BasketViewController: UIViewController {
         button.addTarget(self, action: #selector(completePurchase), for: .touchUpInside)
         return button
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupBindings()
         viewModel.loadBasketProducts()
+        title = "Basket"
     }
-    
+
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(tableView)
+        view.addSubview(emptyStateView)
         view.addSubview(totalLabel)
         view.addSubview(completeButton)
         view.addSubview(loadingContainer)
@@ -80,10 +126,15 @@ class BasketViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: completeButton.topAnchor, constant: -ThemeManager.Spacing.large.rawValue),
-            
+
+            emptyStateView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            emptyStateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emptyStateView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            emptyStateView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
             totalLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ThemeManager.Spacing.large.rawValue),
             totalLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -ThemeManager.Spacing.large.rawValue),
-            
+
             completeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -ThemeManager.Spacing.large.rawValue),
             completeButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -ThemeManager.Spacing.large.rawValue),
             completeButton.widthAnchor.constraint(equalToConstant: 120),
@@ -98,14 +149,20 @@ class BasketViewController: UIViewController {
             loadingIndicator.trailingAnchor.constraint(equalTo: loadingContainer.trailingAnchor, constant: -ThemeManager.Spacing.large.rawValue)
         ])
     }
-    
+
     private func setupBindings() {
         viewModel.onProductsUpdated = { [weak self] in
             guard let self = self else { return }
-            self.updateTotalLabel()
-            self.tableView.reloadData()
+            self.updateUI()
         }
         viewModel.delegate = self
+    }
+
+    private func updateUI() {
+        tableView.reloadData()
+        emptyStateView.isHidden = !viewModel.products.isEmpty
+        tableView.isHidden = viewModel.products.isEmpty
+        updateTotalLabel()
     }
 
     private func updateTotalLabel() {
@@ -126,7 +183,13 @@ class BasketViewController: UIViewController {
     }
 
     @objc private func completePurchase() {
-        print("Purchase completed")
+        showAlert(title: "Purchase completed", message: "Your purchase of \(String(format: "%.2f ₺", viewModel.totalPrice)) TL has been successfully completed")
+    }
+
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -159,6 +222,7 @@ extension BasketViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+// MARK: - BasketViewModelDelegate
 extension BasketViewController: BasketViewModelDelegate {
     func didChangeLoadingState(isLoading: Bool) {
         DispatchQueue.main.async {
@@ -169,5 +233,12 @@ extension BasketViewController: BasketViewModelDelegate {
                 self.loadingIndicator.stopAnimating()
             }
         }
+    }
+}
+
+// MARK: - BasketViewModel
+extension BasketViewModel {
+    var hasNoProducts: Bool {
+        return products.isEmpty
     }
 }

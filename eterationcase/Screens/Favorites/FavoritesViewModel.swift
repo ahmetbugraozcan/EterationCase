@@ -7,20 +7,28 @@
 
 import Foundation
 
+// MARK: - FavoritesViewModel
 class FavoritesViewModel {
     private let favoriteManager = FavoriteManager.shared
     private(set) var products: [ProductModel] = []
     var onProductsUpdated: (() -> Void)?
-    
+    var onLoadingStateChanged: ((Bool) -> Void)?
+
+    var hasNoFavorites: Bool {
+        return products.isEmpty
+    }
+
     func loadFavorites() {
-        let favoriteItems = favoriteManager.getAllFavoriteItems() // Favori ürünlerin id'lerini çek
+        onLoadingStateChanged?(true)
+
+        let favoriteItems = favoriteManager.getAllFavoriteItems()
         let ids = favoriteItems.map { $0.id }
-        
+
         let dispatchGroup = DispatchGroup()
         var fetchedProducts: [ProductModel] = []
-        
+
         for id in ids {
-            guard let id = id else { return }
+            guard let id = id else { return }
             dispatchGroup.enter()
             let request = GetProductByIdRequest(page: 1, limit: 1, id: id)
             NetworkManager.shared.request(requestable: request, responseType: ProductModel.self) { result in
@@ -33,9 +41,10 @@ class FavoritesViewModel {
                 dispatchGroup.leave()
             }
         }
-        
+
         dispatchGroup.notify(queue: .main) {
             self.products = fetchedProducts
+            self.onLoadingStateChanged?(false)
             self.onProductsUpdated?()
         }
     }

@@ -11,8 +11,17 @@ class ProductDetailViewController: UIViewController {
     
     // MARK: - Properties
     var product: ProductModel?
+    var viewModel = ProductDetailViewModel()
     
     // MARK: - UI Components
+    
+    private var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.translatesAutoresizingMaskIntoConstraints = false
@@ -31,11 +40,11 @@ class ProductDetailViewController: UIViewController {
         button.tintColor = .white
         return button
     }()
-
+    
     private lazy var productImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-
+        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -75,7 +84,7 @@ class ProductDetailViewController: UIViewController {
     private lazy var priceContainer: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-       
+        
         return stackView
     }()
     
@@ -105,22 +114,33 @@ class ProductDetailViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        configureProductDetails()
-        setupActions()
-        checkIsInFavorites()
+        setupBindings()
+        fetchProductDetails()
     }
-    
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let transition = CATransition()
+        transition.type = .fade
+        transition.duration = 0.3
+        navigationController?.navigationBar.layer.add(transition, forKey: nil)
+        
+        navigationController?.navigationBar.prefersLargeTitles = false
+    }
+
     // MARK: - Setup Methods
     private func setupUI() {
         view.backgroundColor = .white
         
         view.addSubview(scrollView)
         view.addSubview(bottomBar)
+        view.addSubview(loadingIndicator)
+        
         priceContainer.addArrangedSubview(priceTitle)
         priceContainer.addArrangedSubview(priceLabel)
         
@@ -132,7 +152,7 @@ class ProductDetailViewController: UIViewController {
         
         bottomBar.addArrangedSubview(priceContainer)
         bottomBar.addArrangedSubview(addToCartButton)
-
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -168,7 +188,7 @@ class ProductDetailViewController: UIViewController {
             bottomBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bottomBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             bottomBar.heightAnchor.constraint(equalToConstant: 60),
-
+            
             priceContainer.leadingAnchor.constraint(equalTo: bottomBar.leadingAnchor, constant: 16),
             priceContainer.trailingAnchor.constraint(equalTo: addToCartButton.leadingAnchor, constant: 16),
             addToCartButton.centerYAnchor.constraint(equalTo: bottomBar.centerYAnchor),
@@ -178,30 +198,67 @@ class ProductDetailViewController: UIViewController {
             addToCartButton.trailingAnchor.constraint(equalTo: bottomBar.trailingAnchor, constant: -16),
             addToCartButton.centerYAnchor.constraint(equalTo: bottomBar.centerYAnchor),
             addToCartButton.widthAnchor.constraint(equalToConstant: 120),
+            
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-
+        
         title = product?.name
     }
-
-    private func configureProductDetails() {
-        guard let product = product else { return }
+    
+    // MARK: - ViewModel Bindings
+    private func setupBindings() {
+        viewModel.onLoadingStateChanged = { [weak self] isLoading in
+            self?.toggleLoadingIndicator(isLoading)
+        }
         
+        viewModel.onProductFetched = { [weak self] product in
+            DispatchQueue.main.async {
+                self?.configureProductDetails(with: product)
+            }
+        }
+        
+        viewModel.onErrorOccurred = { [weak self] errorMessage in
+            DispatchQueue.main.async {
+                self?.showErrorAlert(message: errorMessage)
+            }
+        }
+    }
+    // MARK: - Fetch Product Details
+    private func fetchProductDetails() {
+        guard let productId = product?.id else { return }
+        viewModel.fetchProduct(by: productId)
+    }
+    
+    // MARK: - UI Methods
+    private func toggleLoadingIndicator(_ isLoading: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if isLoading {
+                loadingIndicator.startAnimating()
+            } else {
+                loadingIndicator.stopAnimating()
+            }
+        }
+    }
+
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    private func configureProductDetails(with product: ProductModel) {
         titleLabel.text = product.name
         descriptionLabel.text = product.description
         priceLabel.text = "\(product.price) ₺"
+        checkIsInFavorites()
         
         guard let imageURL = URL(string: product.image) else { return }
-        
-        if let cachedImage = ImageCache.shared.object(forKey: product.image as NSString) {
-            productImageView.image = cachedImage
-            return
-        }
 
         DispatchQueue.global().async {
             if let data = try? Data(contentsOf: imageURL),
                let image = UIImage(data: data) {
-                ImageCache.shared.setObject(image, forKey: product.image as NSString)
-                
                 DispatchQueue.main.async {
                     self.productImageView.image = image
                 }
@@ -214,13 +271,13 @@ class ProductDetailViewController: UIViewController {
         favoriteButton.delegate = self
         addToCartButton.addTarget(self, action: #selector(handleAddToCart), for: .touchUpInside)
     }
-        
+    
     func checkIsInFavorites() {
         guard let product = product else { return }
         let isInFavorites = FavoriteManager.shared.isProductInFavorites(productId: product.id)
         favoriteButton.setFavorite(isInFavorites)
     }
-
+    
     // MARK: - Actions
     @objc private func handleBack() {
         navigationController?.popViewController(animated: true)

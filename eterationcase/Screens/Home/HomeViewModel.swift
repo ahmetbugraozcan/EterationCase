@@ -11,6 +11,7 @@ protocol HomeViewModelDelegate: AnyObject {
     func didUpdateProducts()
     func didFailWithError(_ error: String)
     func didChangeLoadingState(isLoading: Bool)
+    func didChangeEmptyState(isEmpty: Bool)
 }
 
 class HomeViewModel {
@@ -27,9 +28,21 @@ class HomeViewModel {
     private var isFiltering = false
     private var hasMoreFilteredData = true
 
-    var products: [ProductModel] = []
-    var searchResults: [ProductModel] = []
-    var filteredProducts: [ProductModel] = []
+    var products: [ProductModel] = [] {
+        didSet {
+            delegate?.didChangeEmptyState(isEmpty: products.isEmpty && !isSearchActive && !isFilterActive)
+        }
+    }
+    var searchResults: [ProductModel] = [] {
+        didSet {
+            delegate?.didChangeEmptyState(isEmpty: searchResults.isEmpty && isSearchActive)
+        }
+    }
+    var filteredProducts: [ProductModel] = [] {
+        didSet {
+            delegate?.didChangeEmptyState(isEmpty: filteredProducts.isEmpty && isFilterActive)
+        }
+    }
 
     var activeSortBy: SortModel?
     var activeBrands: [String] = []
@@ -37,8 +50,16 @@ class HomeViewModel {
 
     weak var delegate: HomeViewModelDelegate?
 
-    var isSearchActive: Bool = false
-    var isFilterActive: Bool = false
+    var isSearchActive: Bool = false {
+        didSet {
+            delegate?.didChangeEmptyState(isEmpty: isSearchActive && searchResults.isEmpty)
+        }
+    }
+    var isFilterActive: Bool = false {
+        didSet {
+            delegate?.didChangeEmptyState(isEmpty: isFilterActive && filteredProducts.isEmpty)
+        }
+    }
 
     private func setLoadingState(_ isLoading: Bool) {
         delegate?.didChangeLoadingState(isLoading: isLoading)

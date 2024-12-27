@@ -7,11 +7,30 @@
 
 import UIKit
 
-import UIKit
-
 class HomeViewController: UIViewController {
 
     // MARK: - UI Components
+    
+    private lazy var emptyStateView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = "No Data Available"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        label.textAlignment = .center
+        label.textColor = .gray
+        view.addSubview(label)
+
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+
+        return view
+    }()
 
     private lazy var loadingContainer: UIView = {
         let container = UIView()
@@ -34,6 +53,8 @@ class HomeViewController: UIViewController {
         let searchBar = UISearchBar()
         searchBar.delegate = self
         searchBar.placeholder = "Search"
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.setBackgroundImage(UIImage(), for: .any, barMetrics: .default)
         return searchBar
     }()
     
@@ -117,6 +138,16 @@ class HomeViewController: UIViewController {
 
         viewModel.fetchProducts()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let transition = CATransition()
+        transition.type = .fade
+        transition.duration = 0.3
+        navigationController?.navigationBar.layer.add(transition, forKey: nil)
+        
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
 
     // MARK: - Setup Methods
 
@@ -124,6 +155,7 @@ class HomeViewController: UIViewController {
         view.addSubview(headerStackView)
         view.addSubview(collectionView)
         view.addSubview(loadingContainer)
+        view.addSubview(emptyStateView)
 
         filterStackView.addArrangedSubview(filtersLabel)
 
@@ -134,11 +166,11 @@ class HomeViewController: UIViewController {
         filterStackView.addArrangedSubview(clearFiltersButton)
 
         NSLayoutConstraint.activate([
-            headerStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            headerStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: ThemeManager.Spacing.large.rawValue),
             headerStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             headerStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
 
-            collectionView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: 16),
+            collectionView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: ThemeManager.Spacing.large.rawValue),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -152,7 +184,12 @@ class HomeViewController: UIViewController {
             loadingIndicator.topAnchor.constraint(equalTo: loadingContainer.topAnchor, constant: ThemeManager.Spacing.large.rawValue),
             loadingIndicator.bottomAnchor.constraint(equalTo: loadingContainer.bottomAnchor, constant: -ThemeManager.Spacing.large.rawValue),
             loadingIndicator.leadingAnchor.constraint(equalTo: loadingContainer.leadingAnchor, constant: ThemeManager.Spacing.large.rawValue),
-            loadingIndicator.trailingAnchor.constraint(equalTo: loadingContainer.trailingAnchor, constant: -ThemeManager.Spacing.large.rawValue)
+            loadingIndicator.trailingAnchor.constraint(equalTo: loadingContainer.trailingAnchor, constant: -ThemeManager.Spacing.large.rawValue),
+            
+            emptyStateView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: ThemeManager.Spacing.large.rawValue),
+            emptyStateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emptyStateView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            emptyStateView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 
@@ -217,8 +254,17 @@ class HomeViewController: UIViewController {
 // MARK: - ViewModel Delegate
 
 extension HomeViewController: HomeViewModelDelegate {
+    func didChangeEmptyState(isEmpty: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.emptyStateView.isHidden = !isEmpty
+            self.collectionView.isHidden = isEmpty
+        }
+    }
+    
     func didUpdateProducts() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             self.collectionView.reloadData()
         }
     }
