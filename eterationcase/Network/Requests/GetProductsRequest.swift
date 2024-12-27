@@ -12,7 +12,7 @@ struct GetProductsRequest: URLRequestable {
     private let page: Int
     private let limit: Int
 
-    var parameters: [String: Any]? {
+    var parameters: [String: Any?]? {
         return ["page": page, "limit": limit]
     }
 

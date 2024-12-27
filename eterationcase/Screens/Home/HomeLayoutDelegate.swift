@@ -10,31 +10,29 @@
 import Foundation
 import UIKit
 
-class HomeLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout {
-    var onScrollReachedEnd: (() -> Void)?
+class HomeCompositionalLayout {
+    static func createLayout(
+        itemsPerRow: Int = 2,
+        itemSpacing: CGFloat = ThemeManager.Spacing.medium.rawValue,
+        estimatedHeight: CGFloat = 300) -> UICollectionViewCompositionalLayout {
+        let itemWidth = 1.0 / CGFloat(itemsPerRow)
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(itemWidth),
+            heightDimension: .estimated(estimatedHeight)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: itemSpacing, leading: itemSpacing, bottom: itemSpacing, trailing: itemSpacing)
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let padding: CGFloat = 16
-        let numberOfItemsPerRow: CGFloat = 2
-        let totalPadding = padding * (numberOfItemsPerRow + 1)
-        let individualItemWidth = (collectionView.frame.width - totalPadding) / numberOfItemsPerRow
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(estimatedHeight)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
-        let estimatedTitleHeight: CGFloat = 40
-        let estimatedPriceHeight: CGFloat = 20
-        let estimatedButtonHeight: CGFloat = 40
-        let imageHeight: CGFloat = individualItemWidth * 0.8
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = itemSpacing
 
-        let totalHeight = imageHeight + estimatedTitleHeight + estimatedPriceHeight + estimatedButtonHeight + (padding * 3)
-        return CGSize(width: individualItemWidth, height: totalHeight)
-    }
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
-
-        if offsetY > contentHeight - height * 2 {
-            onScrollReachedEnd?()
-        }
+        return UICollectionViewCompositionalLayout(section: section)
     }
 }
+

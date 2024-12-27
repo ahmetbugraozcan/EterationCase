@@ -9,10 +9,6 @@
 
 import UIKit
 
-// MARK: - Data Source
-
-import UIKit
-
 protocol HomeDataSourceDelegate: AnyObject {
     func didSelectProduct(_ product: ProductModel)
     func didTapAddToBasket(_ product: ProductModel)
@@ -105,6 +101,6 @@ class HomeDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDele
 
 extension HomeDataSource: ProductCellDelegate {
     func didTapAddToBasket(for product: ProductModel) {
-        delegate?.didTapAddToBasket(product) // Bu işlemi HomeViewController'a iletir
+        delegate?.didTapAddToBasket(product)
     }
 }

@@ -7,45 +7,21 @@
 import UIKit
 
 protocol FilterDelegate: AnyObject {
-    func applyFilter(sortBy: String?, brands: [String], models: [String])
+    func applyFilter(sortBy: SortModel?, brands: [String], models: [String])
 }
 
-class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
 
     // MARK: - Properties
     weak var delegate: FilterDelegate?
-
-    private let sortOptions = ["Old to new", "New to old", "Price high to low", "Price low to High"]
-    private let brandOptions = [
-        "Lamborghini", "Smart", "Ferrari", "Volkswagen", "Mercedes Benz",
-        "Tesla", "Fiat", "Land Rover", "Aston Martin", "Maserati",
-        "Bugatti", "Nissan", "Audi", "Rolls Royce", "Mini",
-        "BMW", "Jeep", "Kia", "Mazda", "Dodge", "Toyota"
-    ]
-
-    private let modelOptions = [
-        "CTS", "Roadster", "Taurus", "Jetta", "Fortwo",
-        "A4", "XC90", "Expedition", "Focus", "Model S",
-        "F-150", "Corvette", "Ranchero", "Colorado", "911",
-        "El Camino", "Grand Cherokee", "Alpine", "Beetle", "Model T",
-        "Mustang", "Malibu", "Accord", "Spyder", "Camry",
-        "Explorer", "Element", "Charger", "Silverado", "LeBaron",
-        "Challenger", "XTS", "Volt", "Altima", "Golf"
-    ]
-
-    private var selectedSortOption: String?
-    private var selectedBrands: Set<String> = []
-    private var selectedModels: Set<String> = []
-
-    private var filteredBrandOptions: [String] = []
-    private var filteredModelOptions: [String] = []
+    private let viewModel = FilterViewModel()
 
     // MARK: - UI Components
 
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Filter"
-        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.font = FontManager.Heading1.regular
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -69,7 +45,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
     private let brandLabel: UILabel = {
         let label = UILabel()
         label.text = "Brand"
-        label.font = .systemFont(ofSize: 18, weight: .medium)
+        label.font = FontManager.Heading3.medium
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -82,12 +58,8 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         return searchBar
     }()
 
-    private let brandCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 8
-        layout.minimumInteritemSpacing = 8
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    private lazy var brandCollectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.tag = 0
@@ -97,7 +69,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
     private let modelLabel: UILabel = {
         let label = UILabel()
         label.text = "Model"
-        label.font = .systemFont(ofSize: 18, weight: .medium)
+        label.font = FontManager.Heading3.medium
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -110,12 +82,8 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         return searchBar
     }()
 
-    private let modelCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 8
-        layout.minimumInteritemSpacing = 8
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    private lazy var modelCollectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.tag = 1
@@ -124,11 +92,11 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
 
     private let applyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Primary", for: .normal)
-        button.backgroundColor = .systemBlue
+        button.setTitle("Apply", for: .normal)
+        button.backgroundColor = ThemeManager.primaryColor
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.layer.cornerRadius = ThemeManager.CornerRadius.medium.rawValue
+        button.titleLabel?.font = FontManager.Body1.semibold
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -140,9 +108,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         setupConstraints()
         setupActions()
         setupCollectionViews()
-
-        filteredBrandOptions = brandOptions
-        filteredModelOptions = modelOptions
+        bindViewModel()
     }
 
     // MARK: - Setup Methods
@@ -161,14 +127,14 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         view.addSubview(modelCollectionView)
         view.addSubview(applyButton)
 
-        sortOptions.forEach { option in
-            let radioButton = createRadioButton(title: option)
+        viewModel.sortOptions.forEach { option in
+            let radioButton = createRadioButton(title: option.getDescription())
             sortStackView.addArrangedSubview(radioButton)
         }
     }
 
     private func setupConstraints() {
-        let padding: CGFloat = 16
+        let padding: CGFloat = ThemeManager.Spacing.large.rawValue
 
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: padding),
@@ -229,86 +195,49 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         modelCollectionView.register(FilterOptionCell.self, forCellWithReuseIdentifier: FilterOptionCell.identifier)
     }
 
-    // MARK: - Actions
-    @objc private func closeButtonTapped() {
-        dismiss(animated: true, completion: nil)
-    }
-
-    @objc private func applyButtonTapped() {
-        delegate?.applyFilter(sortBy: selectedSortOption, brands: Array(selectedBrands), models: Array(selectedModels))
-        dismiss(animated: true, completion: nil)
-    }
-
-    // MARK: - UISearchBarDelegate
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar == brandSearchBar {
-            filteredBrandOptions = searchText.isEmpty ? brandOptions : brandOptions.filter { $0.localizedCaseInsensitiveContains(searchText) }
-            brandCollectionView.reloadData()
-        } else if searchBar == modelSearchBar {
-            filteredModelOptions = searchText.isEmpty ? modelOptions : modelOptions.filter { $0.localizedCaseInsensitiveContains(searchText) }
-            modelCollectionView.reloadData()
-        }
-    }
-
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = ""
-        if searchBar == brandSearchBar {
-            filteredBrandOptions = brandOptions
-            brandCollectionView.reloadData()
-        } else if searchBar == modelSearchBar {
-            filteredModelOptions = modelOptions
-            modelCollectionView.reloadData()
-        }
-    }
-
-    // MARK: - UICollectionViewDelegate & DataSource
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return collectionView.tag == 0 ? filteredBrandOptions.count : filteredModelOptions.count
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FilterOptionCell.identifier, for: indexPath) as? FilterOptionCell else {
-            return UICollectionViewCell()
-        }
-
-        let title = collectionView.tag == 0 ? filteredBrandOptions[indexPath.item] : filteredModelOptions[indexPath.item]
-        let isSelected = collectionView.tag == 0 ? selectedBrands.contains(title) : selectedModels.contains(title)
-
-        cell.configure(with: title, isSelected: isSelected) { [weak self] tappedTitle, isSelected in
+    private func bindViewModel() {
+        viewModel.onUpdate = { [weak self] in
             guard let self = self else { return }
-            if collectionView.tag == 0 { // Brand
-                if isSelected {
-                    self.selectedBrands.insert(tappedTitle)
-                } else {
-                    self.selectedBrands.remove(tappedTitle)
-                }
-            } else { // Model
-                if isSelected {
-                    self.selectedModels.insert(tappedTitle)
-                } else {
-                    self.selectedModels.remove(tappedTitle)
-                }
-            }
+            self.brandCollectionView.reloadData()
+            self.modelCollectionView.reloadData()
         }
-        return cell
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.frame.width - 16
-        return CGSize(width: width, height: 40)
-    }
-
-    // MARK: - Helper Methods
     private func createRadioButton(title: String) -> UIButton {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "circle"), for: .normal)
         button.setImage(UIImage(systemName: "circle.fill"), for: .selected)
         button.setTitle("  \(title)", for: .normal)
         button.setTitleColor(.label, for: .normal)
-        button.tintColor = .systemBlue
+        button.titleLabel?.font = FontManager.Body1.regular
+        button.tintColor = ThemeManager.primaryColor
         button.contentHorizontalAlignment = .left
         button.addTarget(self, action: #selector(radioButtonTapped(_:)), for: .touchUpInside)
         return button
+    }
+
+    private func createCompositionalLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(30))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(30))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = ThemeManager.Spacing.small.rawValue
+
+        return UICollectionViewCompositionalLayout(section: section)
+    }
+
+    // MARK: - Actions
+
+    @objc private func closeButtonTapped() {
+        dismiss(animated: true, completion: nil)
+    }
+
+    @objc private func applyButtonTapped() {
+        delegate?.applyFilter(sortBy: viewModel.selectedSortOption, brands: Array(viewModel.selectedBrands), models: Array(viewModel.selectedModels))
+        dismiss(animated: true, completion: nil)
     }
 
     @objc private func radioButtonTapped(_ sender: UIButton) {
@@ -316,6 +245,45 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
             guard let button = view as? UIButton else { return }
             button.isSelected = button == sender
         }
-        selectedSortOption = sender.title(for: .normal)?.trimmingCharacters(in: .whitespaces)
+        viewModel.selectSortOption(sender.title(for: .normal)?.trimmingCharacters(in: .whitespaces) ?? "")
+    }
+
+    // MARK: - UICollectionViewDataSource
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView == brandCollectionView {
+            return viewModel.filteredBrandOptions.count
+        } else {
+            return viewModel.filteredModelOptions.count
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FilterOptionCell.identifier, for: indexPath) as? FilterOptionCell else {
+            return UICollectionViewCell()
+        }
+
+        let title = collectionView == brandCollectionView ? viewModel.filteredBrandOptions[indexPath.item] : viewModel.filteredModelOptions[indexPath.item]
+        let isSelected = collectionView == brandCollectionView ? viewModel.selectedBrands.contains(title) : viewModel.selectedModels.contains(title)
+
+        cell.configure(with: title, isSelected: isSelected) { [weak self] tappedTitle, isSelected in
+            guard let self = self else { return }
+            if collectionView == brandCollectionView {
+                self.viewModel.toggleBrandSelection(tappedTitle)
+            } else {
+                self.viewModel.toggleModelSelection(tappedTitle)
+            }
+        }
+        return cell
+    }
+
+    // MARK: - UISearchBarDelegate
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar == brandSearchBar {
+            viewModel.searchBrands(with: searchText)
+        } else if searchBar == modelSearchBar {
+            viewModel.searchModels(with: searchText)
+        }
     }
 }

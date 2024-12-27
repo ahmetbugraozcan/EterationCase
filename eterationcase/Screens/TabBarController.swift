@@ -26,5 +26,22 @@ class TabBarController: UITabBarController {
         profileVC.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 3)
 
         self.viewControllers = [homeVC, cartVC, favoritesVC, profileVC]
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCartBadge), name: .basketUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCartBadge), name: .countChanged, object: nil)
+
+        updateCartBadge()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .basketUpdated, object: nil)
+    }
+
+    
+    @objc private func updateCartBadge() {
+        let basketCount = BasketManager.shared.totalBasketItemCount()
+        if let cartTab = self.tabBar.items?[1] {
+            cartTab.badgeValue = basketCount > 0 ? "\(basketCount)" : nil
+        }
     }
 }

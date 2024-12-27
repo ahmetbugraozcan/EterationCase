@@ -13,50 +13,70 @@ class HomeViewController: UIViewController {
 
     // MARK: - UI Components
 
+    private lazy var loadingContainer: UIView = {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        container.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        container.isHidden = true
+        container.addSubview(loadingIndicator)
+        return container
+    }()
+
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .white
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.delegate = self
         searchBar.placeholder = "Search"
         return searchBar
     }()
-
-    private lazy var filterStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        stackView.alignment = .center
-        stackView.distribution = .fill
-
-        let filtersLabel = UILabel()
-        filtersLabel.text = "Filters:"
-        filtersLabel.numberOfLines = 0
-        filtersLabel.lineBreakMode = .byWordWrapping
-        filtersLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        stackView.addArrangedSubview(filtersLabel)
-
-        let spacerView = UIView()
-        spacerView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.addArrangedSubview(spacerView)
-
-        let selectFilterButton = UIButton(type: .system)
+    
+    private lazy var selectFilterButton: UIButton = {
+        let selectFilterButton =  UIButton(type: .system)
         selectFilterButton.setTitle("Select Filter", for: .normal)
         selectFilterButton.addTarget(self, action: #selector(filterTapped), for: .touchUpInside)
         selectFilterButton.setContentHuggingPriority(.required, for: .horizontal)
         selectFilterButton.translatesAutoresizingMaskIntoConstraints = false
-        stackView.addArrangedSubview(selectFilterButton)
-
+        selectFilterButton.backgroundColor = ThemeManager.secondaryColor
+        selectFilterButton.titleLabel?.font =  FontManager.Body2.regular
+        selectFilterButton.setTitleColor(ThemeManager.primaryTextColor, for: .normal)
+        return selectFilterButton
+    }()
+    
+    private lazy var clearFiltersButton: UIButton = {
         let clearFiltersButton = UIButton(type: .system)
         clearFiltersButton.setTitle("Clear Filters", for: .normal)
         clearFiltersButton.addTarget(self, action: #selector(clearFilters), for: .touchUpInside)
         clearFiltersButton.setContentHuggingPriority(.required, for: .horizontal)
         clearFiltersButton.translatesAutoresizingMaskIntoConstraints = false
-        stackView.addArrangedSubview(clearFiltersButton)
+        clearFiltersButton.backgroundColor = ThemeManager.secondaryColor
+        clearFiltersButton.titleLabel?.font =  FontManager.Body2.regular
+        clearFiltersButton.setTitleColor(ThemeManager.primaryTextColor, for: .normal)
+        return clearFiltersButton
+    }()
+    
+    private lazy var filtersLabel: UILabel = {
+        let filtersLabel = UILabel()
+        filtersLabel.text = "Filters:"
+        filtersLabel.numberOfLines = 3
+        filtersLabel.lineBreakMode = .byWordWrapping
+        filtersLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        filtersLabel.font = FontManager.Heading3.regular
+        return filtersLabel
+    }()
 
-        NSLayoutConstraint.activate([
-            selectFilterButton.widthAnchor.constraint(equalToConstant: 100),
-            clearFiltersButton.widthAnchor.constraint(equalToConstant: 100)
-        ])
-
+    private lazy var filterStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = ThemeManager.Spacing.small.rawValue
+        stackView.alignment = .center
+        stackView.distribution = .fill
         return stackView
     }()
 
@@ -69,8 +89,7 @@ class HomeViewController: UIViewController {
     }()
 
     private lazy var collectionView: UICollectionView = {
-        let layout = createLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: HomeCompositionalLayout.createLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(ProductCell.self, forCellWithReuseIdentifier: ProductCell.identifier)
         collectionView.dataSource = dataSource
@@ -93,17 +112,7 @@ class HomeViewController: UIViewController {
 
         dataSource.onScrollReachedEnd = { [weak self] in
             guard let self = self else { return }
-            if self.viewModel.isSearchActive {
-                self.viewModel.searchProducts(query: self.searchBar.text ?? "")
-            } else if self.viewModel.isFilterActive {
-                self.viewModel.fetchFilteredProducts(
-                    sortBy: self.viewModel.activeSortBy,
-                    brands: self.viewModel.activeBrands,
-                    models: self.viewModel.activeModels
-                )
-            } else {
-                self.viewModel.fetchProducts()
-            }
+            self.viewModel.handleScrollReachedEnd(searchQuery: self.searchBar.text)
         }
 
         viewModel.fetchProducts()
@@ -114,6 +123,15 @@ class HomeViewController: UIViewController {
     private func setupLayout() {
         view.addSubview(headerStackView)
         view.addSubview(collectionView)
+        view.addSubview(loadingContainer)
+
+        filterStackView.addArrangedSubview(filtersLabel)
+
+        let spacerView = UIView()
+        spacerView.translatesAutoresizingMaskIntoConstraints = false
+        filterStackView.addArrangedSubview(spacerView)
+        filterStackView.addArrangedSubview(selectFilterButton)
+        filterStackView.addArrangedSubview(clearFiltersButton)
 
         NSLayoutConstraint.activate([
             headerStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
@@ -123,7 +141,18 @@ class HomeViewController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: 16),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
+            selectFilterButton.widthAnchor.constraint(equalToConstant: 100),
+            clearFiltersButton.widthAnchor.constraint(equalToConstant: 100),
+
+            loadingContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingContainer.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
+            loadingIndicator.topAnchor.constraint(equalTo: loadingContainer.topAnchor, constant: ThemeManager.Spacing.large.rawValue),
+            loadingIndicator.bottomAnchor.constraint(equalTo: loadingContainer.bottomAnchor, constant: -ThemeManager.Spacing.large.rawValue),
+            loadingIndicator.leadingAnchor.constraint(equalTo: loadingContainer.leadingAnchor, constant: ThemeManager.Spacing.large.rawValue),
+            loadingIndicator.trailingAnchor.constraint(equalTo: loadingContainer.trailingAnchor, constant: -ThemeManager.Spacing.large.rawValue)
         ])
     }
 
@@ -151,8 +180,8 @@ class HomeViewController: UIViewController {
     private func updateFiltersDisplay() {
         var filtersText = "Filters:"
 
-        if let sortBy = viewModel.activeSortBy, !sortBy.isEmpty {
-            filtersText += " Sort: \(sortBy)"
+        if let sortBy = viewModel.activeSortBy, !sortBy.getDescription().isEmpty {
+            filtersText += " Sort: \(sortBy.getDescription())"
         }
 
         if !viewModel.activeBrands.isEmpty {
@@ -199,6 +228,17 @@ extension HomeViewController: HomeViewModelDelegate {
             print("Error: \(error)")
         }
     }
+    
+    func didChangeLoadingState(isLoading: Bool) {
+        DispatchQueue.main.async {
+            self.loadingContainer.isHidden = !isLoading
+            if isLoading {
+                self.loadingIndicator.startAnimating()
+            } else {
+                self.loadingIndicator.stopAnimating()
+            }
+        }
+    }
 }
 
 // MARK: - SearchBar Delegate
@@ -230,7 +270,7 @@ extension HomeViewController: UISearchBarDelegate {
 // MARK: - Filter Delegate
 
 extension HomeViewController: FilterDelegate {
-    func applyFilter(sortBy: String?, brands: [String], models: [String]) {
+    func applyFilter(sortBy: SortModel?, brands: [String], models: [String]) {
         viewModel.isFilterActive = true
         viewModel.isSearchActive = false
         viewModel.fetchFilteredProducts(sortBy: sortBy, brands: brands, models: models, reset: true)

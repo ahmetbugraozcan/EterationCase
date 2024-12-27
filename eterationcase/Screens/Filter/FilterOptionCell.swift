@@ -13,7 +13,7 @@ class FilterOptionCell: UICollectionViewCell {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = FontManager.Body1.regular
         label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -22,7 +22,7 @@ class FilterOptionCell: UICollectionViewCell {
     private let checkboxImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "square")
-        imageView.tintColor = .systemBlue
+        imageView.tintColor = ThemeManager.primaryColor
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -42,7 +42,7 @@ class FilterOptionCell: UICollectionViewCell {
             checkboxImageView.widthAnchor.constraint(equalToConstant: 24),
             checkboxImageView.heightAnchor.constraint(equalToConstant: 24),
 
-            titleLabel.leadingAnchor.constraint(equalTo: checkboxImageView.trailingAnchor, constant: 8),
+            titleLabel.leadingAnchor.constraint(equalTo: checkboxImageView.trailingAnchor, constant: ThemeManager.Spacing.small.rawValue),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])

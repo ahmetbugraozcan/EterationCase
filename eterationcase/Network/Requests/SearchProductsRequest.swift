@@ -14,7 +14,7 @@ struct SearchProductsRequest: URLRequestable {
     private let limit: Int
     private let search: String
 
-    var parameters: [String: Any]? {
+    var parameters: [String: Any?]? {
         return ["search": search, "page": page, "limit": limit]
     }
 

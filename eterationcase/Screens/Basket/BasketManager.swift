@@ -86,7 +86,7 @@ class BasketManager {
                    item.basketCount += 1
                    saveContext()
                    DispatchQueue.main.async {
-                       NotificationCenter.default.post(name: .basketUpdated, object: nil)
+                       NotificationCenter.default.post(name: .countChanged, object: nil)
                    }
                }
            }
@@ -103,7 +103,7 @@ class BasketManager {
                     saveContext()
                 }
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .basketUpdated, object: nil)
+                    NotificationCenter.default.post(name: .countChanged, object: nil)
                 }
             }
         }
@@ -123,8 +123,13 @@ class BasketManager {
         }
     }
     
+    func totalBasketItemCount() -> Int {
+        let basketItems = fetchBasketItems()
+        return basketItems.reduce(0) { $0 + Int($1.basketCount) }
+    }
 }
 
 extension Notification.Name {
     static let basketUpdated = Notification.Name("basketUpdated")
+    static let countChanged = Notification.Name("countChanged")
 }

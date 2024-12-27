@@ -10,17 +10,34 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    func scene(
+         _ scene: UIScene,
+         willConnectTo session: UISceneSession,
+         options connectionOptions: UIScene.ConnectionOptions
+     ) {
+         guard let windowScene = (scene as? UIWindowScene) else { return }
+         
+         let appearance = UINavigationBarAppearance()
+         appearance.configureWithOpaqueBackground()
+         appearance.backgroundColor = ThemeManager.primaryColor
+         appearance.titleTextAttributes = [
+             NSAttributedString.Key.foregroundColor: UIColor.white
+         ]
+         appearance.largeTitleTextAttributes = [
+             NSAttributedString.Key.foregroundColor: UIColor.white
+         ]
+         
+         UINavigationBar.appearance().standardAppearance = appearance
+         UINavigationBar.appearance().scrollEdgeAppearance = appearance
+         UINavigationBar.appearance().compactAppearance = appearance
+         UINavigationBar.appearance().tintColor = UIColor.white
+         UINavigationBar.appearance().prefersLargeTitles = true
 
-
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-        
-        let window = UIWindow(windowScene: windowScene)
-        let initialViewController = TabBarController()
-        window.rootViewController = initialViewController
-        self.window = window
-        window.makeKeyAndVisible()
-    }
+         window = UIWindow(windowScene: windowScene)
+         let homeVC = TabBarController()
+         window?.rootViewController = homeVC
+         window?.makeKeyAndVisible()
+     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

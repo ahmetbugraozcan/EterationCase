@@ -20,20 +20,20 @@ class ProductCell: UICollectionViewCell {
 
     private let favoriteButton: FavoriteButton = {
         let button = FavoriteButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
 
     private let productImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         return imageView
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .bold)
+        label.font = FontManager.Body2.semibold
         label.textAlignment = .left
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
@@ -42,27 +42,27 @@ class ProductCell: UICollectionViewCell {
     
     private let priceLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .systemBlue
+        label.font = FontManager.Body2.semibold
+        label.textColor = ThemeManager.primaryColor
         label.textAlignment = .left
         return label
     }()
     
     private lazy var addToCartButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Add to Basket", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 8
-        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        button.setTitle("Add to Cart", for: .normal)
+        button.backgroundColor = ThemeManager.primaryColor
+        button.tintColor = ThemeManager.secondaryTextColor
+        button.layer.cornerRadius = ThemeManager.CornerRadius.small.rawValue
+        button.titleLabel?.font = FontManager.Body1.regular
         button.addTarget(self, action: #selector(addToBasketTapped), for: .touchUpInside)
         return button
     }()
     
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [productImageView, titleLabel, priceLabel, addToCartButton])
+        let stackView = UIStackView(arrangedSubviews: [productImageView, priceLabel, titleLabel, addToCartButton])
         stackView.axis = .vertical
-        stackView.spacing = 8
+        stackView.spacing = ThemeManager.Spacing.large.rawValue
         stackView.alignment = .fill
         stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -72,33 +72,29 @@ class ProductCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .white
-        contentView.layer.cornerRadius = 8
         contentView.layer.borderWidth = 1
         contentView.layer.borderColor = UIColor.systemGray4.cgColor
         contentView.layer.masksToBounds = true
 
-        // StackView ve diğer bileşenleri ekle
         contentView.addSubview(stackView)
         contentView.addSubview(favoriteButton)
-        favoriteButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.bringSubviewToFront(favoriteButton)
 
         favoriteButton.delegate = self
 
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: ThemeManager.Spacing.medium.rawValue),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: ThemeManager.Spacing.medium.rawValue),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -ThemeManager.Spacing.medium.rawValue),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -ThemeManager.Spacing.medium.rawValue),
 
             productImageView.heightAnchor.constraint(equalTo: productImageView.widthAnchor),
-            addToCartButton.heightAnchor.constraint(equalToConstant: 40),
+            addToCartButton.heightAnchor.constraint(equalToConstant: 36),
 
-            // Favorite button constraints
-            favoriteButton.topAnchor.constraint(equalTo: productImageView.topAnchor, constant: 8),
-            favoriteButton.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: -8),
-            favoriteButton.widthAnchor.constraint(equalToConstant: 28),
-            favoriteButton.heightAnchor.constraint(equalToConstant: 28)
+            favoriteButton.topAnchor.constraint(equalTo: productImageView.topAnchor, constant: ThemeManager.Spacing.small.rawValue),
+            favoriteButton.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: -ThemeManager.Spacing.small.rawValue),
+            favoriteButton.widthAnchor.constraint(equalToConstant: 24),
+            favoriteButton.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
 

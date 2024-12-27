@@ -7,35 +7,41 @@
 
 import Foundation
 
+protocol BasketViewModelDelegate: AnyObject {
+    func didChangeLoadingState(isLoading: Bool)
+}
+
 class BasketViewModel {
     private let basketManager = BasketManager.shared
     private(set) var products: [ProductModel] = []
     private(set) var basketCounts: [String: Int] = [:]
     var onProductsUpdated: (() -> Void)?
-    var totalPrice: Int {
-        return products.reduce(0) { $0 + ((Int($1.price) ?? 0) * (basketCounts[$1.id] ?? 0)) }
-    }
-    
+    var totalPrice: Double = 0
+    weak var delegate: BasketViewModelDelegate?
+
     init() {
         NotificationCenter.default.addObserver(self, selector: #selector(reloadBasket), name: .basketUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCounts), name: .countChanged, object: nil)
     }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
+    private func setLoadingState(_ isLoading: Bool) {
+        delegate?.didChangeLoadingState(isLoading: isLoading)
+    }
+
     @objc private func reloadBasket() {
         loadBasketProducts()
-//        let basketItems = basketManager.fetchBasketItems()
-//        basketCounts = Dictionary(uniqueKeysWithValues: basketItems.compactMap { ($0.id ?? "", Int($0.basketCount)) })
-//        onProductsUpdated?()
     }
 
     func loadBasketProducts() {
+        setLoadingState(true)
         let basketItems = basketManager.fetchBasketItems()
         basketCounts = Dictionary(uniqueKeysWithValues: basketItems.compactMap { ($0.id ?? "", Int($0.basketCount)) })
 
-        let ids = basketItems.compactMap { $0.id }.sorted() // ID'leri sıralayalım
+        let ids = basketItems.compactMap { $0.id }.sorted()
         let dispatchGroup = DispatchGroup()
         var fetchedProducts: [ProductModel] = []
 
@@ -54,23 +60,38 @@ class BasketViewModel {
         }
 
         dispatchGroup.notify(queue: .main) {
-            // Ürünleri ID'ye göre sıralayalım
             self.products = fetchedProducts.sorted { $0.id < $1.id }
+            self.calculateTotalPrice()
+            self.setLoadingState(false)
             self.onProductsUpdated?()
         }
     }
-    
+
     func increaseProductCount(for id: String) {
         DispatchQueue.main.async {
             self.basketManager.increaseBasketCount(for: id)
-            // basketCounts güncellenmesi NotificationCenter üzerinden gelecek
+            self.updateCounts()
         }
     }
-    
+
     func decreaseProductCount(for id: String) {
         DispatchQueue.main.async {
             self.basketManager.decreaseBasketCount(for: id)
-            // basketCounts güncellenmesi NotificationCenter üzerinden gelecek
+            self.updateCounts()
+        }
+    }
+
+    @objc private func updateCounts() {
+        let basketItems = basketManager.fetchBasketItems()
+        basketCounts = Dictionary(uniqueKeysWithValues: basketItems.compactMap { ($0.id ?? "", Int($0.basketCount)) })
+        self.calculateTotalPrice()
+        onProductsUpdated?()
+    }
+
+    private func calculateTotalPrice() {
+        totalPrice = products.reduce(0) { result, product in
+            guard let count = basketCounts[product.id], let price = Double(product.price) else { return result }
+            return result + (Double(count) * price)
         }
     }
 }
