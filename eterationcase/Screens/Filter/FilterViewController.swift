@@ -1,9 +1,3 @@
-//
-//  FilterViewController.swift
-//  eterationcase
-//
-//  Created by Ahmet Buğra Özcan on 25.12.2024.
-//
 import UIKit
 
 protocol FilterDelegate: AnyObject {
@@ -17,6 +11,26 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
     private let viewModel = FilterViewModel()
 
     // MARK: - UI Components
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.showsVerticalScrollIndicator = true
+        scrollView.alwaysBounceVertical = true
+        return scrollView
+    }()
+    
+    private let containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    private let headerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemBackground
+        return view
+    }()
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -71,6 +85,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.tag = 0
+        collectionView.isScrollEnabled = true
         return collectionView
     }()
 
@@ -95,6 +110,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.tag = 1
+        collectionView.isScrollEnabled = true
         return collectionView
     }()
 
@@ -113,77 +129,111 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupConstraints()
         setupActions()
         setupCollectionViews()
         bindViewModel()
     }
-
+    
     // MARK: - Setup Methods
-
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        view.addSubview(sortByLabel)
-        view.addSubview(titleLabel)
-        view.addSubview(closeButton)
-        view.addSubview(sortStackView)
-        view.addSubview(brandLabel)
-        view.addSubview(brandSearchBar)
-        view.addSubview(brandCollectionView)
-        view.addSubview(modelLabel)
-        view.addSubview(modelSearchBar)
-        view.addSubview(modelCollectionView)
+        // Add header view and its subviews
+        view.addSubview(headerView)
+        headerView.addSubview(titleLabel)
+        headerView.addSubview(closeButton)
+        
+        // Add scroll view and container
+        view.addSubview(scrollView)
+        scrollView.addSubview(containerView)
+        
+        // Add all content to container
+        containerView.addSubview(sortByLabel)
+        containerView.addSubview(sortStackView)
+        containerView.addSubview(brandLabel)
+        containerView.addSubview(brandSearchBar)
+        containerView.addSubview(brandCollectionView)
+        containerView.addSubview(modelLabel)
+        containerView.addSubview(modelSearchBar)
+        containerView.addSubview(modelCollectionView)
+        
+        // Add apply button
         view.addSubview(applyButton)
-
+        
         viewModel.sortOptions.forEach { option in
             let radioButton = createRadioButton(title: option.getDescription())
             sortStackView.addArrangedSubview(radioButton)
         }
+        
+        setupConstraints()
     }
 
     private func setupConstraints() {
         let padding: CGFloat = ThemeManager.Spacing.large.rawValue
-
+        
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: padding),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-
-            closeButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
-            closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-
-            sortByLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: padding),
-            sortByLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            sortByLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
-
+            // Header view constraints
+            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            titleLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            
+            closeButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            closeButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: padding),
+            headerView.heightAnchor.constraint(equalToConstant: 44),
+            
+            // Scroll view constraints
+            scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: applyButton.topAnchor, constant: -padding),
+            
+            // Container view constraints
+            containerView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            containerView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            // Sort section
+            sortByLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
+            sortByLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+            sortByLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
+            
             sortStackView.topAnchor.constraint(equalTo: sortByLabel.bottomAnchor, constant: padding),
-            sortStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            sortStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
-
+            sortStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+            sortStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
+            
+            // Brand section
             brandLabel.topAnchor.constraint(equalTo: sortStackView.bottomAnchor, constant: padding * 2),
-            brandLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-
+            brandLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+            
             brandSearchBar.topAnchor.constraint(equalTo: brandLabel.bottomAnchor),
-            brandSearchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            brandSearchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-
+            brandSearchBar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            brandSearchBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            
             brandCollectionView.topAnchor.constraint(equalTo: brandSearchBar.bottomAnchor, constant: padding),
-            brandCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            brandCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+            brandCollectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+            brandCollectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
             brandCollectionView.heightAnchor.constraint(equalToConstant: 150),
-
+            
+            // Model section
             modelLabel.topAnchor.constraint(equalTo: brandCollectionView.bottomAnchor, constant: padding * 2),
-            modelLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-
+            modelLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+            
             modelSearchBar.topAnchor.constraint(equalTo: modelLabel.bottomAnchor),
-            modelSearchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            modelSearchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-
+            modelSearchBar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            modelSearchBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            
             modelCollectionView.topAnchor.constraint(equalTo: modelSearchBar.bottomAnchor, constant: padding),
-            modelCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            modelCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+            modelCollectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+            modelCollectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
             modelCollectionView.heightAnchor.constraint(equalToConstant: 150),
-
+            modelCollectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding),
+            
+            // Apply button constraints
             applyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
             applyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
             applyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -padding),
@@ -229,21 +279,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         return button
     }
 
-    private func createCompositionalLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(30))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(30))
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-
-        let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = ThemeManager.Spacing.small.rawValue
-
-        return UICollectionViewCompositionalLayout(section: section)
-    }
-
     // MARK: - Actions
-
     @objc private func closeButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
@@ -261,8 +297,22 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         viewModel.selectSortOption(sender.title(for: .normal)?.trimmingCharacters(in: .whitespaces) ?? "")
     }
 
-    // MARK: - UICollectionViewDataSource
+    private func createCompositionalLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(30))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(30))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = ThemeManager.Spacing.small.rawValue
+
+        return UICollectionViewCompositionalLayout(section: section)
+    }
+}
+
+// MARK: - UICollectionViewDataSource
+extension FilterViewController {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == brandCollectionView {
             return viewModel.filteredBrandOptions.count
@@ -292,11 +342,11 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
 
     // MARK: - UISearchBarDelegate
 
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar == brandSearchBar {
-            viewModel.searchBrands(with: searchText)
-        } else if searchBar == modelSearchBar {
-            viewModel.searchModels(with: searchText)
-        }
-    }
+      func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+          if searchBar == brandSearchBar {
+              viewModel.searchBrands(with: searchText)
+          } else if searchBar == modelSearchBar {
+              viewModel.searchModels(with: searchText)
+          }
+      }
 }
