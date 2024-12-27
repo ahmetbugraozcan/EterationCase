@@ -39,7 +39,6 @@ class ProductCell: UICollectionViewCell {
         label.font = FontManager.Body2.semibold
         label.textAlignment = .left
         label.numberOfLines = 1
-        label.lineBreakMode = .byWordWrapping
         return label
     }()
     
