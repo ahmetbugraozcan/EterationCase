@@ -21,10 +21,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
          appearance.configureWithOpaqueBackground()
          appearance.backgroundColor = ThemeManager.primaryColor
          appearance.titleTextAttributes = [
-             NSAttributedString.Key.foregroundColor: UIColor.white
+             NSAttributedString.Key.foregroundColor: UIColor.white,
+             NSAttributedString.Key.font: FontManager.Body1.bold
          ]
          appearance.largeTitleTextAttributes = [
-             NSAttributedString.Key.foregroundColor: UIColor.white
+             NSAttributedString.Key.foregroundColor: UIColor.white,
+             NSAttributedString.Key.font: FontManager.Heading1.bold
          ]
          
          UINavigationBar.appearance().standardAppearance = appearance
