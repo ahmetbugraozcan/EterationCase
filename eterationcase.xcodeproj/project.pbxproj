@@ -36,6 +36,7 @@
 				Models/NetworkError.swift,
 				Network/BaseURLProvider.swift,
 				Network/Endpoints/Endpoints.swift,
+				Network/Endpoints/Parameters.swift,
 				Network/NetworkManager.swift,
 				Network/NetworkManagerProtocol.swift,
 				Network/Requests/GetFilteredProductsRequest.swift,

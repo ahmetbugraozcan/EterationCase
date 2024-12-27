@@ -29,7 +29,6 @@ extension URLRequestable {
             throw NetworkError.invalidURL
         }
         
-        // Query Parameters
         if let parameters = parameters {
             urlComponents.queryItems = parameters
                 .compactMap { key, value in

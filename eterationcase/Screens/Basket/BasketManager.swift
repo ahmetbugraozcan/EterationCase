@@ -128,8 +128,3 @@ class BasketManager {
         return basketItems.reduce(0) { $0 + Int($1.basketCount) }
     }
 }
-
-extension Notification.Name {
-    static let basketUpdated = Notification.Name("basketUpdated")
-    static let countChanged = Notification.Name("countChanged")
-}

@@ -14,7 +14,7 @@ class BasketViewController: UIViewController {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
         container.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-        container.layer.cornerRadius = 10
+        container.layer.cornerRadius = ThemeManager.CornerRadius.medium.rawValue
         container.clipsToBounds = true
         container.isHidden = true
         container.addSubview(loadingIndicator)

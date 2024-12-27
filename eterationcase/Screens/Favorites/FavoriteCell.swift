@@ -16,7 +16,7 @@ class FavoriteCell: UITableViewCell {
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = ThemeManager.CornerRadius.large.rawValue
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 2)
         view.layer.shadowRadius = 4
@@ -29,7 +29,7 @@ class FavoriteCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.backgroundColor = .systemGray6
-        imageView.layer.cornerRadius = 8
+        imageView.layer.cornerRadius = ThemeManager.CornerRadius.medium.rawValue
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView

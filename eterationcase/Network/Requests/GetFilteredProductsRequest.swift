@@ -17,7 +17,14 @@ struct GetFilteredProductsRequest: URLRequestable {
     private let sortField: String?
 
     var parameters: [String: Any?]? {
-        return ["page": page, "limit": limit, "brand": brand, "model": model, "sortBy": sortOption, "order": sortField]
+        return [
+            Parameters.page.rawValue: page,
+            Parameters.limit.rawValue: limit,
+            Parameters.brand.rawValue: brand,
+            Parameters.model.rawValue: model,
+            Parameters.sortBy.rawValue: sortOption,
+            Parameters.order.rawValue: sortField
+        ]
     }
 
     init(

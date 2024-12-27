@@ -15,7 +15,11 @@ struct SearchProductsRequest: URLRequestable {
     private let search: String
 
     var parameters: [String: Any?]? {
-        return ["search": search, "page": page, "limit": limit]
+        return [
+            Parameters.search.rawValue: search,
+            Parameters.page.rawValue: page,
+            Parameters.limit.rawValue: limit
+        ]
     }
 
     init(page: Int, limit: Int, search: String) {

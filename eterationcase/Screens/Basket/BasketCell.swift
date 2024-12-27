@@ -48,7 +48,7 @@ class BasketCell: UITableViewCell {
         button.setTitle("-", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .clear
-        button.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+        button.titleLabel?.font = FontManager.Heading2.medium
         button.backgroundColor = ThemeManager.secondaryContainterColor
         button.addTarget(self, action: #selector(decreaseTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +60,7 @@ class BasketCell: UITableViewCell {
         button.setTitle("+", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = ThemeManager.secondaryContainterColor
-        button.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+        button.titleLabel?.font = FontManager.Heading2.medium
         button.addTarget(self, action: #selector(increaseTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -96,13 +96,11 @@ class BasketCell: UITableViewCell {
         backgroundColor = .clear
         selectionStyle = .none
 
-        // Ana container ve bileşenler
         contentView.addSubview(containerView)
         containerView.addSubview(titleLabel)
         containerView.addSubview(priceLabel)
         containerView.addSubview(quantityContainerView)
 
-        // Quantity StackView içeriği
         quantityContainerView.addArrangedSubview(decreaseButton)
         quantityContainerView.addArrangedSubview(countContainer)
         quantityContainerView.addArrangedSubview(increaseButton)
@@ -110,39 +108,31 @@ class BasketCell: UITableViewCell {
         countContainer.addSubview(countLabel)
 
         NSLayoutConstraint.activate([
-            // Container View
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
 
-            // Title Label
             titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
 
-            // Price Label
             priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             priceLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             priceLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
 
-            // Quantity Container
             quantityContainerView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             quantityContainerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             quantityContainerView.heightAnchor.constraint(equalToConstant: 36),
             quantityContainerView.widthAnchor.constraint(equalToConstant: 120),
 
-            // Decrease Button
             decreaseButton.widthAnchor.constraint(equalTo: quantityContainerView.widthAnchor, multiplier: 0.3),
 
-            // Count Container
             countContainer.widthAnchor.constraint(equalTo: quantityContainerView.widthAnchor, multiplier: 0.4),
             countContainer.heightAnchor.constraint(equalTo: quantityContainerView.heightAnchor),
 
-            // Count Label
             countLabel.centerXAnchor.constraint(equalTo: countContainer.centerXAnchor),
             countLabel.centerYAnchor.constraint(equalTo: countContainer.centerYAnchor),
 
-            // Increase Button
             increaseButton.widthAnchor.constraint(equalTo: quantityContainerView.widthAnchor, multiplier: 0.3)
         ])
     }
