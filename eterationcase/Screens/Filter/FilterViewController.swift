@@ -51,7 +51,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
     private let sortStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 16
+        stackView.spacing = ThemeManager.Spacing.large.rawValue
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -138,16 +138,13 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        // Add header view and its subviews
         view.addSubview(headerView)
         headerView.addSubview(titleLabel)
         headerView.addSubview(closeButton)
         
-        // Add scroll view and container
         view.addSubview(scrollView)
         scrollView.addSubview(containerView)
         
-        // Add all content to container
         containerView.addSubview(sortByLabel)
         containerView.addSubview(sortStackView)
         containerView.addSubview(brandLabel)
@@ -157,7 +154,6 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         containerView.addSubview(modelSearchBar)
         containerView.addSubview(modelCollectionView)
         
-        // Add apply button
         view.addSubview(applyButton)
         
         viewModel.sortOptions.forEach { option in
