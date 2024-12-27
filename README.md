@@ -14,9 +14,11 @@ Bu proje, bir alışveriş uygulaması olup ürün listeleme, detay görüntüle
 | **Favoriler Düzenleme** | **Ürün Detay Ekranı** | **Filtrelenmiş Ürünler** |
 | <img src="screenshots/searchedproducts.png" alt="Arama Sonuçları" height="250"> | <img src="screenshots/filtersearched.png" alt="Filtre ve Arama Sonuçları" height="250"> | <img src="screenshots/cart.png" alt="Sepet" height="250"> |
 | **Arama Sonuçları** | **Filtre ve Arama Sonuçları** | **Sepet** |
-| <img src="screenshots/cartempty.png" alt="Boş Sepet" height="250"> | | |
+| <img src="screenshots/cartempty.png" alt="Boş Sepet" height="250"> | 
 | **Boş Sepet** | | |
 
+### Video Tanıtımı
+[Proje tanıtım videosunu izlemek için buraya tıklayın.](https://vimeo.com/1042451643)
 ---
 
 ## 📂 Proje Mimarisi
