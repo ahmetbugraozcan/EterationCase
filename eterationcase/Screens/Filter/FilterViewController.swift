@@ -42,6 +42,14 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
         return stackView
     }()
 
+    private let sortByLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Sort By"
+        label.font = FontManager.Heading3.medium
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     private let brandLabel: UILabel = {
         let label = UILabel()
         label.text = "Brand"
@@ -115,7 +123,8 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
-
+        
+        view.addSubview(sortByLabel)
         view.addSubview(titleLabel)
         view.addSubview(closeButton)
         view.addSubview(sortStackView)
@@ -143,14 +152,18 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
             closeButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
 
-            sortStackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: padding),
+            sortByLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: padding),
+            sortByLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
+            sortByLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+
+            sortStackView.topAnchor.constraint(equalTo: sortByLabel.bottomAnchor, constant: padding),
             sortStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
             sortStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
 
             brandLabel.topAnchor.constraint(equalTo: sortStackView.bottomAnchor, constant: padding * 2),
             brandLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
 
-            brandSearchBar.topAnchor.constraint(equalTo: brandLabel.bottomAnchor, constant: padding),
+            brandSearchBar.topAnchor.constraint(equalTo: brandLabel.bottomAnchor),
             brandSearchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             brandSearchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
@@ -162,7 +175,7 @@ class FilterViewController: UIViewController, UISearchBarDelegate, UICollectionV
             modelLabel.topAnchor.constraint(equalTo: brandCollectionView.bottomAnchor, constant: padding * 2),
             modelLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
 
-            modelSearchBar.topAnchor.constraint(equalTo: modelLabel.bottomAnchor, constant: padding),
+            modelSearchBar.topAnchor.constraint(equalTo: modelLabel.bottomAnchor),
             modelSearchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             modelSearchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
