@@ -213,6 +213,7 @@ class ProductDetailViewController: UIViewController {
         viewModel.onProductFetched = { [weak self] product in
             DispatchQueue.main.async {
                 self?.configureProductDetails(with: product)
+                self?.setupActions()
             }
         }
         
