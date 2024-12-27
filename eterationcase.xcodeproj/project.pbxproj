@@ -38,20 +38,17 @@
 			);
 			target = A0C73D9A2D1C62ED005B7378 /* eterationcaseTests */;
 		};
-		A0C73DAD2D1C62ED005B7378 /* Exceptions for "eterationcase" folder in "eterationcase" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = A0C73D812D1C62EB005B7378 /* eterationcase */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		A02FDA702D1EE534004B0469 /* screenshots */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = screenshots;
+			sourceTree = "<group>";
+		};
 		A0C73D842D1C62EB005B7378 /* eterationcase */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A0C73DAD2D1C62ED005B7378 /* Exceptions for "eterationcase" folder in "eterationcase" target */,
 				A0016E632D1ED89C00B93FC5 /* Exceptions for "eterationcase" folder in "eterationcaseTests" target */,
 			);
 			path = eterationcase;
@@ -90,6 +87,7 @@
 		A0C73D792D1C62EB005B7378 = {
 			isa = PBXGroup;
 			children = (
+				A02FDA702D1EE534004B0469 /* screenshots */,
 				A0C73D842D1C62EB005B7378 /* eterationcase */,
 				A0C73D9E2D1C62ED005B7378 /* eterationcaseTests */,
 				A0C73DA82D1C62ED005B7378 /* eterationcaseUITests */,
@@ -122,6 +120,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				A02FDA702D1EE534004B0469 /* screenshots */,
 				A0C73D842D1C62EB005B7378 /* eterationcase */,
 			);
 			name = eterationcase;
