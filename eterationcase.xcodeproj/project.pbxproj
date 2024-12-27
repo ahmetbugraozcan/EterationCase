@@ -14,19 +14,11 @@
 			remoteGlobalIDString = A0C73D812D1C62EB005B7378;
 			remoteInfo = eterationcase;
 		};
-		A0C73DA62D1C62ED005B7378 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A0C73D7A2D1C62EB005B7378 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A0C73D812D1C62EB005B7378;
-			remoteInfo = eterationcase;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A0C73D822D1C62EB005B7378 /* eterationcase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = eterationcase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0C73D9B2D1C62ED005B7378 /* eterationcaseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = eterationcaseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A0C73DA52D1C62ED005B7378 /* eterationcaseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = eterationcaseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -37,6 +29,24 @@
 			);
 			target = A0C73D812D1C62EB005B7378 /* eterationcase */;
 		};
+		A0DA96BD2D1EB74400249BA1 /* Exceptions for "eterationcase" folder in "eterationcaseTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models/HTTPMethodType.swift,
+				Models/NetworkError.swift,
+				Network/BaseURLProvider.swift,
+				Network/Endpoints/Endpoints.swift,
+				Network/Endpoints/Parameters.swift,
+				Network/NetworkManager.swift,
+				Network/NetworkManagerProtocol.swift,
+				Network/Requests/GetFilteredProductsRequest.swift,
+				Network/Requests/GetProductByIdRequest.swift,
+				Network/Requests/GetProductsRequest.swift,
+				Network/Requests/SearchProductsRequest.swift,
+				Network/URLRequestable.swift,
+			);
+			target = A0C73D9A2D1C62ED005B7378 /* eterationcaseTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -44,6 +54,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A0C73DAD2D1C62ED005B7378 /* Exceptions for "eterationcase" folder in "eterationcase" target */,
+				A0DA96BD2D1EB74400249BA1 /* Exceptions for "eterationcase" folder in "eterationcaseTests" target */,
 			);
 			path = eterationcase;
 			sourceTree = "<group>";
@@ -51,11 +62,6 @@
 		A0C73D9E2D1C62ED005B7378 /* eterationcaseTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = eterationcaseTests;
-			sourceTree = "<group>";
-		};
-		A0C73DA82D1C62ED005B7378 /* eterationcaseUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = eterationcaseUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,13 +81,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A0C73DA22D1C62ED005B7378 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -90,7 +89,6 @@
 			children = (
 				A0C73D842D1C62EB005B7378 /* eterationcase */,
 				A0C73D9E2D1C62ED005B7378 /* eterationcaseTests */,
-				A0C73DA82D1C62ED005B7378 /* eterationcaseUITests */,
 				A0C73D832D1C62EB005B7378 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -100,7 +98,6 @@
 			children = (
 				A0C73D822D1C62EB005B7378 /* eterationcase.app */,
 				A0C73D9B2D1C62ED005B7378 /* eterationcaseTests.xctest */,
-				A0C73DA52D1C62ED005B7378 /* eterationcaseUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,29 +150,6 @@
 			productReference = A0C73D9B2D1C62ED005B7378 /* eterationcaseTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		A0C73DA42D1C62ED005B7378 /* eterationcaseUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A0C73DB62D1C62ED005B7378 /* Build configuration list for PBXNativeTarget "eterationcaseUITests" */;
-			buildPhases = (
-				A0C73DA12D1C62ED005B7378 /* Sources */,
-				A0C73DA22D1C62ED005B7378 /* Frameworks */,
-				A0C73DA32D1C62ED005B7378 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A0C73DA72D1C62ED005B7378 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A0C73DA82D1C62ED005B7378 /* eterationcaseUITests */,
-			);
-			name = eterationcaseUITests;
-			packageProductDependencies = (
-			);
-			productName = eterationcaseUITests;
-			productReference = A0C73DA52D1C62ED005B7378 /* eterationcaseUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -190,10 +164,6 @@
 						CreatedOnToolsVersion = 16.1;
 					};
 					A0C73D9A2D1C62ED005B7378 = {
-						CreatedOnToolsVersion = 16.1;
-						TestTargetID = A0C73D812D1C62EB005B7378;
-					};
-					A0C73DA42D1C62ED005B7378 = {
 						CreatedOnToolsVersion = 16.1;
 						TestTargetID = A0C73D812D1C62EB005B7378;
 					};
@@ -215,7 +185,6 @@
 			targets = (
 				A0C73D812D1C62EB005B7378 /* eterationcase */,
 				A0C73D9A2D1C62ED005B7378 /* eterationcaseTests */,
-				A0C73DA42D1C62ED005B7378 /* eterationcaseUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -229,13 +198,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A0C73D992D1C62ED005B7378 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A0C73DA32D1C62ED005B7378 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -259,13 +221,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A0C73DA12D1C62ED005B7378 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -273,11 +228,6 @@
 			isa = PBXTargetDependency;
 			target = A0C73D812D1C62EB005B7378 /* eterationcase */;
 			targetProxy = A0C73D9C2D1C62ED005B7378 /* PBXContainerItemProxy */;
-		};
-		A0C73DA72D1C62ED005B7378 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A0C73D812D1C62EB005B7378 /* eterationcase */;
-			targetProxy = A0C73DA62D1C62ED005B7378 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -293,6 +243,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = eterationcase/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -319,6 +270,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = eterationcase/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -491,40 +443,6 @@
 			};
 			name = Release;
 		};
-		A0C73DB72D1C62ED005B7378 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GH6KQDR3C9;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ahmetbugraozcan.eterationcaseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = eterationcase;
-			};
-			name = Debug;
-		};
-		A0C73DB82D1C62ED005B7378 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GH6KQDR3C9;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ahmetbugraozcan.eterationcaseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = eterationcase;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -551,15 +469,6 @@
 			buildConfigurations = (
 				A0C73DB42D1C62ED005B7378 /* Debug */,
 				A0C73DB52D1C62ED005B7378 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A0C73DB62D1C62ED005B7378 /* Build configuration list for PBXNativeTarget "eterationcaseUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A0C73DB72D1C62ED005B7378 /* Debug */,
-				A0C73DB82D1C62ED005B7378 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
